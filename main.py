@@ -29,7 +29,19 @@ with app.app_context():
         db.session.add(admin_user)
         db.session.commit()
 
-        print("Default Admin Created Successfully")
+    all_users = User.query.all()
+
+    print("\n===== USERS IN DATABASE =====")
+    for user in all_users:
+        print(
+            user.id,
+            user.full_name,
+            user.email,
+            user.role,
+            user.status
+        )
+    print("=============================\n")
+    #print("Default Admin Created Successfully")
 
 @app.route("/")
 def home():

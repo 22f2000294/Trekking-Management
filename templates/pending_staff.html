@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pending Staff</title>
+</head>
+<body>
+
+<h1>Pending Staff Requests</h1>
+
+{% for staff in staff_members %}
+
+<p>
+    {{ staff.full_name }}
+    ({{ staff.email }})
+
+    <a href="/approve_staff/{{ staff.id }}">
+        Approve
+    </a>
+</p>
+
+{% endfor %}
+
+</body>
+</html>

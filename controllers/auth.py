@@ -72,3 +72,27 @@ def login():
         else:
             return render_template("user_dashboard.html")
     return render_template("login.html")
+
+@auth.route("/admin/pending_staff")
+def pending_staff():
+
+    staff_members = User.query.filter_by(
+        role="staff",
+        status="pending"
+    ).all()
+
+    return render_template(
+        "pending_staff.html",
+        staff_members=staff_members
+    )
+
+@auth.route("/approve_staff/<int:user_id>")
+def approve_staff(user_id):
+
+    staff = User.query.get(user_id)
+
+    if staff:
+        staff.status = "approved"
+        db.session.commit()
+
+    return redirect(url_for("auth.pending_staff"))
