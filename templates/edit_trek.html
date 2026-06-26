@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Edit Trek</title>
+</head>
+
+<body>
+
+<h1>Edit Trek</h1>
+
+<form method="POST">
+
+    Trek Name <br>
+    <input
+        type="text"
+        name="trek_name"
+        value="{{ trek.trek_name }}"
+        required
+    >
+
+    <br><br>
+
+    Difficulty <br>
+
+    <select name="difficulty">
+
+        <option {% if trek.difficulty=="Easy" %}selected{% endif %}>Easy</option>
+
+        <option {% if trek.difficulty=="Moderate" %}selected{% endif %}>Moderate</option>
+
+        <option {% if trek.difficulty=="Hard" %}selected{% endif %}>Hard</option>
+
+    </select>
+
+    <br><br>
+
+    Duration
+
+    <br>
+
+    <input
+        type="number"
+        name="duration_days"
+        value="{{ trek.duration_days }}"
+    >
+
+    <br><br>
+
+    Available Slots
+
+    <br>
+
+    <input
+        type="number"
+        name="available_slots"
+        value="{{ trek.available_slots }}"
+    >
+
+    <br><br>
+
+    <input
+        type="submit"
+        value="Update Trek"
+    >
+
+</form>
+
+</body>
+
+</html>

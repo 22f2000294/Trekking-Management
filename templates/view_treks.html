@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>View Treks</title>
+</head>
+
+<body>
+
+<h1>All Treks</h1>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>ID</th>
+    <th>Trek Name</th>
+    <th>Difficulty</th>
+    <th>Duration</th>
+    <th>Available Slots</th>
+    <th>Edit</th>
+    <th>Delete</th>
+</tr>
+
+{% for trek in treks %}
+
+<tr>
+
+<td>{{ trek.id }}</td>
+
+<td>{{ trek.trek_name }}</td>
+
+<td>{{ trek.difficulty }}</td>
+
+<td>{{ trek.duration_days }}</td>
+
+<td>{{ trek.available_slots }}</td>
+
+<td>
+    <a href="/admin/edit_trek/{{ trek.id }}">Edit</a>
+</td>
+
+<td>
+    <a href="/admin/delete_trek/{{ trek.id }}">Delete</a>
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/admin/dashboard">Back to Dashboard</a>
+
+</body>
+</html>
