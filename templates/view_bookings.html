@@ -19,6 +19,7 @@
     <th>Booking Status</th>
     <th>Payment Status</th>
     <th>Action</th>
+    <th>Payment</th>
 </tr>
 
 {% for booking in bookings %}
@@ -31,6 +32,21 @@
 <td>{{ booking.booking_date }}</td>
 <td>{{ booking.booking_status }}</td>
 <td>{{ booking.payment_status }}</td>
+<td>
+
+{% if booking.payment_status == "Unpaid" %}
+
+<a href="/admin/mark_paid/{{ booking.id }}">
+    Mark Paid
+</a>
+
+{% else %}
+
+Paid
+
+{% endif %}
+
+</td>
 <td>
 
 {% if booking.booking_status == "Pending" %}
@@ -46,6 +62,7 @@ Completed
 {% endif %}
 
 </td>
+
 
 </tr>
 

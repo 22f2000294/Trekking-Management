@@ -162,7 +162,17 @@ def add_trek():
 @auth.route("/admin/treks")
 def view_treks():
 
-    treks = Trek.query.all()
+    search = request.args.get("search")
+
+    if search:
+
+        treks = Trek.query.filter(
+            Trek.trek_name.ilike(f"%{search}%")
+        ).all()
+
+    else:
+
+        treks = Trek.query.all()
 
     return render_template(
         "view_treks.html",
@@ -205,16 +215,27 @@ def edit_trek(id):
 @auth.route("/admin/staff")
 def view_staff():
 
-    staff_members = User.query.filter_by(
-        role="staff",
-        status="approved"
-    ).all()
+    search = request.args.get("search")
+
+    if search:
+
+        staff_members = User.query.filter(
+            User.role == "staff",
+            User.status == "approved",
+            User.full_name.ilike(f"%{search}%")
+        ).all()
+
+    else:
+
+        staff_members = User.query.filter_by(
+            role="staff",
+            status="approved"
+        ).all()
 
     return render_template(
         "view_staff.html",
         staff_members=staff_members
     )
-
 
 @auth.route("/admin/assign_staff/<int:trek_id>", methods=["GET", "POST"])
 def assign_staff(trek_id):
@@ -338,6 +359,30 @@ def view_bookings():
         "view_bookings.html",
         bookings=bookings
     )
+
+
+@auth.route("/admin/complete_booking/<int:booking_id>")
+def complete_booking(booking_id):
+
+    booking = Booking.query.get_or_404(booking_id)
+
+    booking.booking_status = "Completed"
+
+    db.session.commit()
+
+    return redirect(url_for("auth.view_bookings"))
+
+
+@auth.route("/admin/mark_paid/<int:booking_id>")
+def mark_paid(booking_id):
+
+    booking = Booking.query.get_or_404(booking_id)
+
+    booking.payment_status = "Paid"
+
+    db.session.commit()
+
+    return redirect(url_for("auth.view_bookings"))
 
 @auth.route("/admin/deactivate_user/<int:user_id>")
 def deactivate_user(user_id):
