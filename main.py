@@ -3,6 +3,7 @@ from models.models import db, User
 from werkzeug.security import generate_password_hash
 from controllers.auth import auth
 
+
 app = Flask(__name__)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///trekking.sqlite"
@@ -10,6 +11,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
 app.register_blueprint(auth)
+
 
 
 with app.app_context():

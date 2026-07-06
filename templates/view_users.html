@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>All Users</title>
+</head>
+
+<body>
+
+<h1>All Users</h1>
+
+<form method="GET">
+
+    <input
+        type="text"
+        name="search"
+        placeholder="Search user..."
+    >
+
+    <input
+        type="submit"
+        value="Search"
+    >
+
+</form>
+
+<br>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Role</th>
+    <th>Status</th>
+    <th>Action</th>
+</tr>
+
+{% for user in users %}
+
+<tr>
+
+<td>{{ user.id }}</td>
+<td>{{ user.full_name }}</td>
+<td>{{ user.email }}</td>
+<td>{{ user.role }}</td>
+<td>{{ user.status }}</td>
+<td>
+
+{% if user.role == "Admin" %}
+
+-
+
+{% elif user.status == "approved" %}
+
+<a href="/admin/deactivate_user/{{ user.id }}">
+    Deactivate
+</a>
+
+{% else %}
+
+<a href="/admin/activate_user/{{ user.id }}">
+    Activate
+</a>
+
+{% endif %}
+
+</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/admin/dashboard">Back to Dashboard</a>
+
+</body>
+</html>

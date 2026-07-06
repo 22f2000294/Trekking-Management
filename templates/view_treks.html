@@ -17,8 +17,11 @@
     <th>Difficulty</th>
     <th>Duration</th>
     <th>Available Slots</th>
+    <th>Assigned Staff</th>
+    <th>Assign</th>
     <th>Edit</th>
     <th>Delete</th>
+    <th>Remove</th>
 </tr>
 
 {% for trek in treks %}
@@ -34,6 +37,34 @@
 <td>{{ trek.duration_days }}</td>
 
 <td>{{ trek.available_slots }}</td>
+
+<td>
+    {% if trek.assigned_staff %}
+        {{ trek.assigned_staff.full_name }}
+    {% else %}
+        Not Assigned
+    {% endif %}
+</td>
+
+<td>
+    <a href="/admin/assign_staff/{{ trek.id }}">Assign</a>
+</td>
+
+<td>
+
+{% if trek.assigned_staff %}
+
+<a href="/admin/remove_staff/{{ trek.id }}">
+    Remove
+</a>
+
+{% else %}
+
+-
+
+{% endif %}
+
+</td>
 
 <td>
     <a href="/admin/edit_trek/{{ trek.id }}">Edit</a>

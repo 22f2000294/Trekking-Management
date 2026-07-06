@@ -1,6 +1,8 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
+from models.models import db, User, Trek, Booking
+from sqlalchemy import or_
 
 from models.models import (
     db,
@@ -64,6 +66,9 @@ def login():
 
         if not check_password_hash(user.password, password):
             return "Incorrect password"
+        
+        if user.status == "deactivated":
+            return "Your account has been deactivated by Admin."
 
         if user.role == "staff" and user.status == "pending":
             return "Waiting for Admin Approval"
@@ -195,3 +200,164 @@ def edit_trek(id):
         "edit_trek.html",
         trek=trek
     )
+
+
+@auth.route("/admin/staff")
+def view_staff():
+
+    staff_members = User.query.filter_by(
+        role="staff",
+        status="approved"
+    ).all()
+
+    return render_template(
+        "view_staff.html",
+        staff_members=staff_members
+    )
+
+
+@auth.route("/admin/assign_staff/<int:trek_id>", methods=["GET", "POST"])
+def assign_staff(trek_id):
+
+    trek = Trek.query.get_or_404(trek_id)
+
+    staff_members = User.query.filter_by(
+        role="staff",
+        status="approved"
+    ).all()
+
+    if request.method == "POST":
+
+        trek.assigned_staff_id = request.form["staff_id"]
+
+        db.session.commit()
+
+        return redirect(url_for("auth.view_treks"))
+
+    return render_template(
+        "assign_staff.html",
+        trek=trek,
+        staff_members=staff_members
+    )
+
+
+@auth.route("/admin/remove_staff/<int:trek_id>")
+def remove_staff(trek_id):
+
+    trek = Trek.query.get_or_404(trek_id)
+
+    trek.assigned_staff_id = None
+
+    db.session.commit()
+
+    return redirect(url_for("auth.view_treks"))
+
+@auth.route("/admin/users")
+def view_users():
+
+    search = request.args.get("search")
+
+    if search:
+
+        users = User.query.filter(
+
+            or_(
+
+                User.full_name.ilike(f"%{search}%"),
+                User.email.ilike(f"%{search}%"),
+                User.id.cast(db.String).ilike(f"%{search}%")
+
+            )
+
+        ).all()
+
+    else:
+
+        users = User.query.all()
+
+    return render_template(
+        "view_users.html",
+        users=users
+    )
+
+
+@auth.route("/user/treks")
+def user_treks():
+
+    treks = Trek.query.filter_by(
+        status="Open"
+    ).all()
+
+    return render_template(
+        "user_treks.html",
+        treks=treks
+    )
+
+@auth.route("/user/book_trek/<int:trek_id>")
+def book_trek(trek_id):
+
+    user = User.query.filter_by(
+        role="trekker"
+    ).first()
+
+    booking = Booking(
+        user_id=user.id,
+        trek_id=trek_id
+    )
+
+    db.session.add(booking)
+
+    db.session.commit()
+
+    return "Trek Booked Successfully"
+
+
+@auth.route("/user/bookings")
+def my_bookings():
+
+    user = User.query.filter_by(
+        role="trekker"
+    ).first()
+
+    bookings = Booking.query.filter_by(
+        user_id=user.id
+    ).all()
+
+    return render_template(
+        "my_bookings.html",
+        bookings=bookings
+    )
+
+
+@auth.route("/admin/bookings")
+def view_bookings():
+
+    bookings = Booking.query.all()
+
+    return render_template(
+        "view_bookings.html",
+        bookings=bookings
+    )
+
+@auth.route("/admin/deactivate_user/<int:user_id>")
+def deactivate_user(user_id):
+
+    user = User.query.get_or_404(user_id)
+
+    user.status = "deactivated"
+
+    db.session.commit()
+
+    return redirect(url_for("auth.view_users"))
+
+
+@auth.route("/admin/activate_user/<int:user_id>")
+def activate_user(user_id):
+
+    user = User.query.get_or_404(user_id)
+
+    user.status = "approved"
+
+    db.session.commit()
+
+    return redirect(url_for("auth.view_users"))

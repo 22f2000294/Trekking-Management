@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>View Staff</title>
+</head>
+
+<body>
+
+<h1>Approved Staff Members</h1>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>Email</th>
+    <th>Status</th>
+</tr>
+
+{% for staff in staff_members %}
+
+<tr>
+
+<td>{{ staff.id }}</td>
+<td>{{ staff.full_name }}</td>
+<td>{{ staff.email }}</td>
+<td>{{ staff.status }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/admin/dashboard">Back to Dashboard</a>
+
+</body>
+</html>

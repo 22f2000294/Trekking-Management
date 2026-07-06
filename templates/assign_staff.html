@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Assign Staff</title>
+</head>
+
+<body>
+
+<h2>Assign Staff to {{ trek.trek_name }}</h2>
+
+<form method="POST">
+
+    <label>Select Staff</label>
+    <br><br>
+
+    <select name="staff_id">
+
+        {% for staff in staff_members %}
+
+        <option value="{{ staff.id }}">
+            {{ staff.full_name }}
+        </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br><br>
+
+    <input type="submit" value="Assign Staff">
+
+</form>
+
+<br>
+
+<a href="/admin/treks">Back to Treks</a>
+
+</body>
+
+</html>

@@ -27,6 +27,13 @@ class User(db.Model):
         lazy=True
     )
 
+    assigned_treks = db.relationship(
+    "Trek",
+    foreign_keys="Trek.assigned_staff_id",
+    backref="assigned_staff",
+    lazy=True
+    )
+
 
 class StaffProfile(db.Model):
     __tablename__ = "staff_profiles"
@@ -105,6 +112,16 @@ class Booking(db.Model):
         default="Unpaid"
     )
 
+
+    # user = db.relationship(
+    #     "User",
+    #     backref="booking_records"
+    # )
+
+    # trek = db.relationship(
+    #     "Trek",
+    #     backref="booking_records"
+    # )
 
 class Review(db.Model):
     __tablename__ = "reviews"
