@@ -68,6 +68,11 @@ class Trek(db.Model):
         default="Open"
     )
 
+    progress_status = db.Column(
+        db.String(20),
+        default="Not Started"
+    )
+
     assigned_staff_id = db.Column(
         db.Integer,
         db.ForeignKey("users.id")
@@ -112,16 +117,6 @@ class Booking(db.Model):
         default="Unpaid"
     )
 
-
-    # user = db.relationship(
-    #     "User",
-    #     backref="booking_records"
-    # )
-
-    # trek = db.relationship(
-    #     "Trek",
-    #     backref="booking_records"
-    # )
 
 class Review(db.Model):
     __tablename__ = "reviews"

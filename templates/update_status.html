@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Update Trek Status</title>
+</head>
+
+<body>
+
+<h1>Update Trek Status</h1>
+
+<h3>Trek: {{ trek.trek_name }}</h3>
+
+<form method="POST">
+
+    <label>Status:</label>
+
+    <select name="status" required>
+
+        <option value="Open">Open</option>
+        <option value="Closed">Closed</option>
+
+    </select>
+
+    <br><br>
+
+    <input
+        type="submit"
+        value="Update Status"
+    >
+
+</form>
+
+<br>
+
+<a href="/staff/dashboard">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>

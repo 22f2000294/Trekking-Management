@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Registered Participants</title>
+</head>
+
+<body>
+
+<h1>Registered Participants</h1>
+
+<h3>Trek: {{ trek.trek_name }}</h3>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>Booking ID</th>
+    <th>Participant Name</th>
+    <th>Email</th>
+    <th>Booking Status</th>
+    <th>Payment Status</th>
+    <th>Action</th>
+</tr>
+
+{% for booking in bookings %}
+
+
+<tr>
+    <td>{{ booking.id }}</td>
+    <td>{{ booking.user.full_name }}</td>
+    <td>{{ booking.user.email }}</td>
+    <td>{{ booking.booking_status }}</td>
+    <td>{{ booking.payment_status }}</td>
+
+<td>
+
+    {% if booking.booking_status == "Cancelled" %}
+
+        Cancelled
+
+    {% else %}
+
+        <a href="/staff/remove_participant/{{ booking.id }}">
+            Remove
+        </a>
+
+    {% endif %}
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/staff/dashboard">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>

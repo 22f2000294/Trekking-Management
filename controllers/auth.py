@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 from models.models import db, User, Trek, Booking
@@ -72,6 +72,9 @@ def login():
 
         if user.role == "staff" and user.status == "pending":
             return "Waiting for Admin Approval"
+        
+        session["user_id"] = user.id
+        session["role"] = user.role
 
         if user.role == "Admin":
             return redirect(url_for("auth.admin_dashboard"))
@@ -132,8 +135,169 @@ def admin_dashboard():
 
 @auth.route("/staff/dashboard")
 def staff_dashboard():
-    return render_template("staff_dashboard.html")
 
+    staff_id = session["user_id"]
+
+    assigned_treks = Trek.query.filter_by(
+        assigned_staff_id=staff_id
+    ).all()
+
+    assigned_treks_count = len(assigned_treks)
+
+    trek_ids = [trek.id for trek in assigned_treks]
+
+    registered_trekkers_count = Booking.query.filter(
+        Booking.trek_id.in_(trek_ids)
+    ).count()
+
+    return render_template(
+        "staff_dashboard.html",
+        assigned_treks=assigned_treks,
+        assigned_treks_count=assigned_treks_count,
+        registered_trekkers_count=registered_trekkers_count
+    )
+
+
+@auth.route("/staff/update_slots/<int:trek_id>", methods=["GET", "POST"])
+def update_slots(trek_id):
+
+    staff_id = session["user_id"]
+
+    trek = Trek.query.filter_by(
+        id=trek_id,
+        assigned_staff_id=staff_id
+    ).first_or_404()
+
+    if request.method == "POST":
+
+        trek.available_slots = request.form["available_slots"]
+
+        db.session.commit()
+
+        return redirect(url_for("auth.staff_dashboard"))
+
+    return render_template(
+        "update_slots.html",
+        trek=trek
+    )
+
+
+@auth.route("/staff/update_status/<int:trek_id>", methods=["GET", "POST"])
+def update_status(trek_id):
+
+    staff_id = session["user_id"]
+
+    trek = Trek.query.filter_by(
+        id=trek_id,
+        assigned_staff_id=staff_id
+    ).first_or_404()
+
+    if request.method == "POST":
+
+        trek.status = request.form["status"]
+
+        db.session.commit()
+
+        return redirect(url_for("auth.staff_dashboard"))
+
+    return render_template(
+        "update_status.html",
+        trek=trek
+    )
+
+
+@auth.route("/staff/update_progress/<int:trek_id>", methods=["GET", "POST"])
+def update_progress(trek_id):
+
+    staff_id = session["user_id"]
+
+    trek = Trek.query.filter_by(
+        id=trek_id,
+        assigned_staff_id=staff_id
+    ).first_or_404()
+
+    if request.method == "POST":
+
+        trek.progress_status = request.form["progress_status"]
+
+        db.session.commit()
+
+        return redirect(url_for("auth.staff_dashboard"))
+
+    return render_template(
+        "update_progress.html",
+        trek=trek
+    )
+
+
+@auth.route("/staff/participants/<int:trek_id>")
+def view_participants(trek_id):
+
+    staff_id = session["user_id"]
+
+    # Ensure trek belongs to logged-in staff
+    trek = Trek.query.filter_by(
+        id=trek_id,
+        assigned_staff_id=staff_id
+    ).first_or_404()
+
+    bookings = Booking.query.filter_by(
+        trek_id=trek.id
+    ).all()
+
+    return render_template(
+        "view_participants.html",
+        trek=trek,
+        bookings=bookings
+    )
+
+
+@auth.route("/staff/profile", methods=["GET", "POST"])
+def staff_profile():
+
+    staff = User.query.get_or_404(session["user_id"])
+
+    if request.method == "POST":
+
+        staff.full_name = request.form["full_name"]
+        staff.email = request.form["email"]
+
+        password = request.form["password"]
+
+        if password:
+            staff.password = generate_password_hash(password)
+
+        db.session.commit()
+
+        return redirect(url_for("auth.staff_dashboard"))
+
+    return render_template(
+        "staff_profile.html",
+        staff=staff
+    )
+
+@auth.route("/staff/remove_participant/<int:booking_id>")
+def remove_participant(booking_id):
+
+    staff_id = session["user_id"]
+
+    booking = Booking.query.get_or_404(booking_id)
+
+    trek = Trek.query.filter_by(
+        id=booking.trek_id,
+        assigned_staff_id=staff_id
+    ).first_or_404()
+
+    booking.booking_status = "Cancelled"
+
+    db.session.commit()
+
+    return redirect(
+        url_for(
+            "auth.view_participants",
+            trek_id=trek.id
+        )
+    )
 
 @auth.route("/user/dashboard")
 def user_dashboard():
@@ -406,3 +570,4 @@ def activate_user(user_id):
     db.session.commit()
 
     return redirect(url_for("auth.view_users"))
+

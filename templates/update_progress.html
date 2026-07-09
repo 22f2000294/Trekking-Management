@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Update Trek Progress</title>
+</head>
+
+<body>
+
+<h1>Update Trek Progress</h1>
+
+<h3>Trek: {{ trek.trek_name }}</h3>
+
+<form method="POST">
+
+    <label>Progress Status:</label>
+
+    <select name="progress_status" required>
+
+        <option value="Not Started">Not Started</option>
+        <option value="Ongoing">Ongoing</option>
+        <option value="Completed">Completed</option>
+
+    </select>
+
+    <br><br>
+
+    <input
+        type="submit"
+        value="Update Progress"
+    >
+
+</form>
+
+<br>
+
+<a href="/staff/dashboard">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Update Profile</title>
+</head>
+
+<body>
+
+<h1>Update Profile</h1>
+
+<form method="POST">
+
+    <label>Full Name</label><br>
+
+    <input
+        type="text"
+        name="full_name"
+        value="{{ staff.full_name }}"
+        required
+    >
+
+    <br><br>
+
+    <label>Email</label><br>
+
+    <input
+        type="email"
+        name="email"
+        value="{{ staff.email }}"
+        required
+    >
+
+    <br><br>
+
+    <br>
+
+    <label>New Password (Leave blank if no change)</label><br>
+
+    <input
+        type="password"
+        name="password"
+    >
+
+    <br><br>
+
+    <input
+        type="submit"
+        value="Update Profile"
+    >
+
+</form>
+
+<br>
+
+<a href="/staff/dashboard">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>
