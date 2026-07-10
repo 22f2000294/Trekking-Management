@@ -113,7 +113,7 @@ class Booking(db.Model):
 
     booking_status = db.Column(
         db.String(20),
-        default="Pending"
+        default="Booked"
     )
 
     payment_status = db.Column(

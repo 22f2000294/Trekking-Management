@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Admin Trekking History</title>
+</head>
+
+<body>
+
+<h1>All Trekking History</h1>
+
+<table border="1" cellpadding="10">
+
+<tr>
+    <th>Booking ID</th>
+    <th>User Name</th>
+    <th>Trek Name</th>
+    <th>Location</th>
+    <th>Booking Date</th>
+    <th>Booking Status</th>
+</tr>
+
+{% for booking in bookings %}
+
+<tr>
+    <td>{{ booking.id }}</td>
+    <td>{{ booking.user.full_name }}</td>
+    <td>{{ booking.trek.trek_name }}</td>
+    <td>{{ booking.trek.location }}</td>
+    <td>{{ booking.booking_date }}</td>
+    <td>{{ booking.booking_status }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br>
+
+<a href="/admin/dashboard">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>

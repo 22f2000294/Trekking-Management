@@ -49,7 +49,7 @@ Paid
 </td>
 <td>
 
-{% if booking.booking_status == "Pending" %}
+{% if booking.booking_status == "Booked" %}
 
 <a href="/admin/complete_booking/{{ booking.id }}">
     Complete
@@ -57,7 +57,7 @@ Paid
 
 {% else %}
 
-Completed
+{{ booking.booking_status }}
 
 {% endif %}
 

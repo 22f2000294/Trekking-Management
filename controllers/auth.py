@@ -504,15 +504,16 @@ def book_trek(trek_id):
 
     trek = Trek.query.get_or_404(trek_id)
 
-    if trek.status == "Closed":
-        return "This trek is closed for booking"
+    if trek.status != "Open":
+        return "Booking is allowed only for Open treks"
 
     if trek.available_slots <= 0:
         return "No slots available for this trek"
 
-    existing_booking = Booking.query.filter_by(
-        user_id=user_id,
-        trek_id=trek_id
+    existing_booking = Booking.query.filter(
+        Booking.user_id == user_id,
+        Booking.trek_id == trek_id,
+        Booking.booking_status != "Cancelled"
     ).first()
 
     if existing_booking:
@@ -520,7 +521,8 @@ def book_trek(trek_id):
 
     booking = Booking(
         user_id=user_id,
-        trek_id=trek_id
+        trek_id=trek_id,
+        booking_status="Booked"
     )
 
     db.session.add(booking)
@@ -543,6 +545,27 @@ def my_bookings():
         "my_bookings.html",
         bookings=bookings
     )
+
+
+@auth.route("/user/cancel_booking/<int:booking_id>")
+def cancel_booking(booking_id):
+
+    user_id = session["user_id"]
+
+    booking = Booking.query.filter_by(
+        id=booking_id,
+        user_id=user_id
+    ).first_or_404()
+
+    if booking.booking_status != "Cancelled":
+
+        booking.booking_status = "Cancelled"
+
+        booking.trek.available_slots += 1
+
+        db.session.commit()
+
+    return redirect(url_for("auth.my_bookings"))
 
 
 @auth.route("/user/trekking_history")
@@ -594,6 +617,19 @@ def view_bookings():
     return render_template(
         "view_bookings.html",
         bookings=bookings
+    )
+
+
+@auth.route("/admin/trekking_history")
+def admin_trekking_history():
+
+    completed_bookings = Booking.query.filter_by(
+        booking_status="Completed"
+    ).all()
+
+    return render_template(
+        "admin_trekking_history.html",
+        bookings=completed_bookings
     )
 
 
