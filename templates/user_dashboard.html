@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>User Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -30,6 +32,61 @@
 </a>
 
 <br><br>
+
+<h2>My Booking Trends</h2>
+
+<div style="width: 720px; height: 420px;">
+
+    <canvas id="userChart"></canvas>
+
+</div>
+
+<br>
+
+<script>
+
+    const ctx = document.getElementById("userChart");
+
+    new Chart(ctx, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Booked",
+                "Cancelled",
+                "Completed"
+            ],
+
+            datasets: [{
+
+                label: "My Bookings",
+
+                data: [
+                    {{ booked_count }},
+                    {{ cancelled_count }},
+                    {{ completed_count }}
+                ],
+
+                backgroundColor: [
+                    "red",
+                    "green",
+                    "blue"
+                ]
+
+            }]
+
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+
+    });
+
+</script>
 
 </body>
 </html>

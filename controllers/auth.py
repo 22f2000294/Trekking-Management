@@ -142,6 +142,21 @@ def staff_dashboard():
         assigned_staff_id=staff_id
     ).all()
 
+    trek_names = []
+    participant_counts = []
+
+    for trek in assigned_treks:
+
+        trek_names.append(trek.trek_name)
+
+        participant_count = Booking.query.filter(
+            Booking.trek_id == trek.id,
+            Booking.booking_status != "Cancelled"
+        ).count()
+
+        participant_counts.append(participant_count)
+
+
     assigned_treks_count = len(assigned_treks)
 
     trek_ids = [trek.id for trek in assigned_treks]
@@ -154,7 +169,9 @@ def staff_dashboard():
         "staff_dashboard.html",
         assigned_treks=assigned_treks,
         assigned_treks_count=assigned_treks_count,
-        registered_trekkers_count=registered_trekkers_count
+        registered_trekkers_count=registered_trekkers_count,
+        trek_names=trek_names,
+        participant_counts=participant_counts
     )
 
 
@@ -305,7 +322,30 @@ def remove_participant(booking_id):
 
 @auth.route("/user/dashboard")
 def user_dashboard():
-    return render_template("user_dashboard.html")
+
+    user_id = session["user_id"]
+
+    booked_count = Booking.query.filter_by(
+        user_id=user_id,
+        booking_status="Booked"
+    ).count()
+
+    cancelled_count = Booking.query.filter_by(
+        user_id=user_id,
+        booking_status="Cancelled"
+    ).count()
+
+    completed_count = Booking.query.filter_by(
+        user_id=user_id,
+        booking_status="Completed"
+    ).count()
+
+    return render_template(
+        "user_dashboard.html",
+        booked_count=booked_count,
+        cancelled_count=cancelled_count,
+        completed_count=completed_count
+    )
 
 @auth.route("/admin/add_trek", methods=["GET", "POST"])
 def add_trek():

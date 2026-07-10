@@ -3,6 +3,8 @@
 
 <head>
     <title>Staff Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -79,6 +81,49 @@
 {% endfor %}
 
 </table>
+
+<h2>Participants Per Trek</h2>
+
+<div style="width: 720px; height: 420px;">
+
+    <canvas id="staffChart"></canvas>
+
+</div>
+
+<br>
+
+<script>
+
+    const ctx = document.getElementById("staffChart");
+
+    new Chart(ctx, {
+
+        type: "bar",
+
+        data: {
+
+            labels: {{ trek_names | tojson }},
+
+            datasets: [{
+
+                label: "Participant Count",
+
+                data: {{ participant_counts | tojson }},
+
+                backgroundColor: "SkyBlue"
+
+            }]
+
+        },
+
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+
+    });
+
+</script>
 
 </body>
 

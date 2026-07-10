@@ -3,6 +3,7 @@
 
 <head>
     <title>Admin Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -20,6 +21,12 @@
 <h3>Total Bookings : {{ total_bookings }}</h3>
 
 <hr>
+
+<h2>Admin Statistics</h2>
+
+<canvas id="adminChart" width="350" height="150"></canvas>
+
+<br>
 
 <a href="/admin/pending_staff">Pending Staff Requests</a>
 <br><br>
@@ -51,4 +58,49 @@ View All Bookings
 </a>
 
 </body>
+
+
+<script>
+
+    const ctx = document.getElementById("adminChart");
+
+    new Chart(ctx, {
+
+        type: "bar",
+
+        data: {
+
+            labels: [
+                "Total Treks",
+                "Total Bookings",
+                "Total Users"
+            ],
+
+            datasets: [{
+
+                label: "Admin Statistics",
+
+                data: [
+                    {{ total_treks }},
+                    {{ total_bookings }},
+                    {{ total_users }}
+                ],
+
+                backgroundColor: [
+                    "pink",
+                    "green",
+                    "blue"
+                ]
+
+            }]
+
+        }
+
+    });
+
+</script>
+
 </html>
+
+
+
