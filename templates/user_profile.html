@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Update Profile</title>
+</head>
+
+<body>
+
+<h1>Update User Profile</h1>
+
+<form method="POST">
+
+    <label>Full Name:</label><br>
+
+    <input
+        type="text"
+        name="full_name"
+        value="{{ user.full_name }}"
+        required
+    >
+
+    <br><br>
+
+    <label>Email:</label><br>
+
+    <input
+        type="email"
+        name="email"
+        value="{{ user.email }}"
+        required
+    >
+
+    <br><br>
+
+    <label>New Password (Leave blank if no change):</label><br>
+
+    <input
+        type="password"
+        name="password"
+    >
+
+    <br><br>
+
+    <input
+        type="submit"
+        value="Update Profile"
+    >
+
+</form>
+
+<br>
+
+<a href="/user/dashboard">
+    Back to Dashboard
+</a>
+
+</body>
+
+</html>

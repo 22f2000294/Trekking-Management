@@ -2,6 +2,7 @@ from flask import Flask
 from models.models import db, User
 from werkzeug.security import generate_password_hash
 from controllers.auth import auth
+from sqlalchemy import text
 
 
 app = Flask(__name__)
@@ -18,6 +19,20 @@ app.register_blueprint(auth)
 with app.app_context():
 
     db.create_all()
+
+    try:
+        db.session.execute(
+            text(
+                "ALTER TABLE treks "
+                "ADD COLUMN location VARCHAR(100)"
+            )
+        )
+        db.session.commit()
+        print("location column added successfully")
+
+    except Exception:
+        db.session.rollback()
+        print("location column already exists")
 
     # Create default admin if not exists
     admin = User.query.filter_by(

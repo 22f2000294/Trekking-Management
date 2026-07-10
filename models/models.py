@@ -58,6 +58,10 @@ class Trek(db.Model):
 
     trek_name = db.Column(db.String(100), nullable=False)
 
+    location = db.Column(
+        db.String(100)
+    )
+
     difficulty = db.Column(db.String(50))
     duration_days = db.Column(db.Integer)
 

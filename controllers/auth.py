@@ -288,9 +288,13 @@ def remove_participant(booking_id):
         assigned_staff_id=staff_id
     ).first_or_404()
 
-    booking.booking_status = "Cancelled"
+    if booking.booking_status != "Cancelled":
 
-    db.session.commit()
+        booking.booking_status = "Cancelled"
+
+        trek.available_slots += 1
+
+        db.session.commit()
 
     return redirect(
         url_for(
@@ -310,6 +314,7 @@ def add_trek():
 
         trek = Trek(
             trek_name=request.form["trek_name"],
+            location = request.form["location"],
             difficulty=request.form["difficulty"],
             duration_days=request.form["duration_days"],
             available_slots=request.form["available_slots"]
@@ -362,6 +367,7 @@ def edit_trek(id):
     if request.method == "POST":
 
         trek.trek_name = request.form["trek_name"]
+        trek.location = request.form["location"]
         trek.difficulty = request.form["difficulty"]
         trek.duration_days = request.form["duration_days"]
         trek.available_slots = request.form["available_slots"]
@@ -469,9 +475,22 @@ def view_users():
 @auth.route("/user/treks")
 def user_treks():
 
-    treks = Trek.query.filter_by(
-        status="Open"
-    ).all()
+    search = request.args.get("search")
+    difficulty = request.args.get("difficulty")
+
+    query = Trek.query.filter_by(status="Open")
+
+    if search:
+        query = query.filter(
+            Trek.location.ilike(f"%{search}%")
+        )
+
+    if difficulty:
+        query = query.filter(
+            Trek.difficulty == difficulty
+        )
+
+    treks = query.all()
 
     return render_template(
         "user_treks.html",
@@ -481,17 +500,31 @@ def user_treks():
 @auth.route("/user/book_trek/<int:trek_id>")
 def book_trek(trek_id):
 
-    user = User.query.filter_by(
-        role="trekker"
+    user_id = session["user_id"]
+
+    trek = Trek.query.get_or_404(trek_id)
+
+    if trek.status == "Closed":
+        return "This trek is closed for booking"
+
+    if trek.available_slots <= 0:
+        return "No slots available for this trek"
+
+    existing_booking = Booking.query.filter_by(
+        user_id=user_id,
+        trek_id=trek_id
     ).first()
 
+    if existing_booking:
+        return "You have already booked this trek"
+
     booking = Booking(
-        user_id=user.id,
+        user_id=user_id,
         trek_id=trek_id
     )
 
     db.session.add(booking)
-
+    trek.available_slots -= 1
     db.session.commit()
 
     return "Trek Booked Successfully"
@@ -500,17 +533,56 @@ def book_trek(trek_id):
 @auth.route("/user/bookings")
 def my_bookings():
 
-    user = User.query.filter_by(
-        role="trekker"
-    ).first()
+    user_id = session["user_id"]
 
     bookings = Booking.query.filter_by(
-        user_id=user.id
+        user_id=user_id
     ).all()
 
     return render_template(
         "my_bookings.html",
         bookings=bookings
+    )
+
+
+@auth.route("/user/trekking_history")
+def trekking_history():
+
+    user_id = session["user_id"]
+
+    completed_bookings = Booking.query.filter_by(
+        user_id=user_id,
+        booking_status="Completed"
+    ).all()
+
+    return render_template(
+        "trekking_history.html",
+        bookings=completed_bookings
+    )
+
+
+@auth.route("/user/profile", methods=["GET", "POST"])
+def user_profile():
+
+    user = User.query.get_or_404(session["user_id"])
+
+    if request.method == "POST":
+
+        user.full_name = request.form["full_name"]
+        user.email = request.form["email"]
+
+        password = request.form["password"]
+
+        if password:
+            user.password = generate_password_hash(password)
+
+        db.session.commit()
+
+        return redirect(url_for("auth.user_dashboard"))
+
+    return render_template(
+        "user_profile.html",
+        user=user
     )
 
 
