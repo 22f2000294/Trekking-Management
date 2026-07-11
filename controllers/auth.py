@@ -11,14 +11,14 @@ from models.models import (
     Booking
 )
 
-auth = Blueprint("auth", __name__)
+auth = Blueprint("auth", __name__)   #creating all the routes inside a blueprint named as auth
 
-
+#registration of a new user at diff - diff role
 @auth.route("/register", methods=["GET", "POST"])
 def register():
 
     if request.method == "POST":
-
+        #if already registered and try to login
         full_name = request.form["full_name"]
         email = request.form["email"].strip().lower()   #suppose user enter User@gmail.com and later tries user@gmail.com
         password = request.form["password"]
@@ -32,22 +32,22 @@ def register():
 
         if role not in ["trekker", "staff"]:
             return "Invalid role selected"
-        
+    
         if "@" not in email or "." not in email:
             return "Invalid email address"
 
-        existing_user = User.query.filter_by(
+        existing_user = User.query.filter_by(      #it checks out the email in database
             email=email
         ).first()
 
-        if existing_user:
+        if existing_user:                         #if exist 
             return "Email already exists"
 
-        if role == "staff":
+        if role == "staff": 
             status = "pending"
         else:
             status = "approved"
-
+#registeration of a new user
         new_user = User(
             full_name=full_name,
             email=email,
@@ -63,6 +63,7 @@ def register():
 
     return render_template("register.html")
 
+#login existing user
 @auth.route("/login", methods=["GET", "POST"])
 def login():
 
@@ -97,7 +98,7 @@ def login():
         else:
             return redirect(url_for("auth.user_dashboard"))
     return render_template("login.html")
-
+#route of pending staff 
 @auth.route("/admin/pending_staff")
 def pending_staff():
 
@@ -110,7 +111,7 @@ def pending_staff():
         "pending_staff.html",
         staff_members=staff_members
     )
-
+#route of approved staff
 @auth.route("/approve_staff/<int:user_id>")
 def approve_staff(user_id):
 
@@ -121,7 +122,7 @@ def approve_staff(user_id):
         db.session.commit()
 
     return redirect(url_for("auth.pending_staff"))
-
+#route of admin dashboard
 @auth.route("/admin/dashboard")
 def admin_dashboard():
 
@@ -143,8 +144,7 @@ def admin_dashboard():
         total_treks=total_treks,
         total_bookings=total_bookings
     )
-
-
+#route of staff dashboard
 @auth.route("/staff/dashboard")
 def staff_dashboard():
 
@@ -186,7 +186,7 @@ def staff_dashboard():
         participant_counts=participant_counts
     )
 
-
+#staff can update slots from using it 
 @auth.route("/staff/update_slots/<int:trek_id>", methods=["GET", "POST"])
 def update_slots(trek_id):
 
@@ -199,7 +199,12 @@ def update_slots(trek_id):
 
     if request.method == "POST":
 
-        trek.available_slots = request.form["available_slots"]
+        available_slots = int(request.form["available_slots"])
+
+        if available_slots < 0:
+            return "Available slots cannot be negative"
+
+        trek.available_slots = available_slots
 
         db.session.commit()
 
@@ -210,7 +215,7 @@ def update_slots(trek_id):
         trek=trek
     )
 
-
+#staff can update status from using it 
 @auth.route("/staff/update_status/<int:trek_id>", methods=["GET", "POST"])
 def update_status(trek_id):
 
@@ -234,7 +239,7 @@ def update_status(trek_id):
         trek=trek
     )
 
-
+#staff can update progress from using it 
 @auth.route("/staff/update_progress/<int:trek_id>", methods=["GET", "POST"])
 def update_progress(trek_id):
 
@@ -258,7 +263,7 @@ def update_progress(trek_id):
         trek=trek
     )
 
-
+#staff can view participants from using it 
 @auth.route("/staff/participants/<int:trek_id>")
 def view_participants(trek_id):
 
@@ -280,7 +285,7 @@ def view_participants(trek_id):
         bookings=bookings
     )
 
-
+#staff can view staff profile from using it 
 @auth.route("/staff/profile", methods=["GET", "POST"])
 def staff_profile():
 
@@ -304,7 +309,7 @@ def staff_profile():
         "staff_profile.html",
         staff=staff
     )
-
+#staff can remove participants from using it 
 @auth.route("/staff/remove_participant/<int:booking_id>")
 def remove_participant(booking_id):
 
@@ -331,7 +336,7 @@ def remove_participant(booking_id):
             trek_id=trek.id
         )
     )
-
+#route of user dashboard
 @auth.route("/user/dashboard")
 def user_dashboard():
 
@@ -358,7 +363,7 @@ def user_dashboard():
         cancelled_count=cancelled_count,
         completed_count=completed_count
     )
-
+#route of add treks 
 @auth.route("/admin/add_trek", methods=["GET", "POST"])
 def add_trek():
 
@@ -396,7 +401,7 @@ def add_trek():
 
     return render_template("add_trek.html")
 
-
+#route of view treks
 @auth.route("/admin/treks")
 def view_treks():
 
@@ -416,7 +421,7 @@ def view_treks():
         "view_treks.html",
         treks=treks
     )
-
+#route of delete trek
 @auth.route("/admin/delete_trek/<int:id>")
 def delete_trek(id):
 
@@ -427,7 +432,7 @@ def delete_trek(id):
 
     return redirect(url_for("auth.view_treks"))
 
-
+#route of edit trek
 @auth.route("/admin/edit_trek/<int:id>", methods=["GET", "POST"])
 def edit_trek(id):
 
@@ -452,11 +457,11 @@ def edit_trek(id):
         if available_slots < 1:
             return "Available slots must be at least 1"
 
-        trek.trek_name = request.form["trek_name"]
-        trek.location = request.form["location"]
+        trek.trek_name = trek_name
+        trek.location = location
         trek.difficulty = request.form["difficulty"]
-        trek.duration_days = request.form["duration_days"]
-        trek.available_slots = request.form["available_slots"]
+        trek.duration_days = duration_days
+        trek.available_slots = available_slots
 
         db.session.commit()
 
@@ -467,7 +472,7 @@ def edit_trek(id):
         trek=trek
     )
 
-
+#route of view staff
 @auth.route("/admin/staff")
 def view_staff():
 
@@ -492,7 +497,7 @@ def view_staff():
         "view_staff.html",
         staff_members=staff_members
     )
-
+#route of assign staff by admin
 @auth.route("/admin/assign_staff/<int:trek_id>", methods=["GET", "POST"])
 def assign_staff(trek_id):
 
@@ -517,7 +522,7 @@ def assign_staff(trek_id):
         staff_members=staff_members
     )
 
-
+#route of remove staff by admin
 @auth.route("/admin/remove_staff/<int:trek_id>")
 def remove_staff(trek_id):
 
@@ -528,7 +533,7 @@ def remove_staff(trek_id):
     db.session.commit()
 
     return redirect(url_for("auth.view_treks"))
-
+#route of view user 
 @auth.route("/admin/users")
 def view_users():
 
@@ -557,7 +562,7 @@ def view_users():
         users=users
     )
 
-
+#route to view user treks
 @auth.route("/user/treks")
 def user_treks():
 
@@ -582,7 +587,7 @@ def user_treks():
         "user_treks.html",
         treks=treks
     )
-
+#route of book trek
 @auth.route("/user/book_trek/<int:trek_id>")
 def book_trek(trek_id):
 
@@ -617,7 +622,7 @@ def book_trek(trek_id):
 
     return "Trek Booked Successfully"
 
-
+#route of my bookings
 @auth.route("/user/bookings")
 def my_bookings():
 
@@ -632,7 +637,7 @@ def my_bookings():
         bookings=bookings
     )
 
-
+#route of cancel booking
 @auth.route("/user/cancel_booking/<int:booking_id>")
 def cancel_booking(booking_id):
 
@@ -653,7 +658,7 @@ def cancel_booking(booking_id):
 
     return redirect(url_for("auth.my_bookings"))
 
-
+#route of trekking history
 @auth.route("/user/trekking_history")
 def trekking_history():
 
@@ -669,7 +674,7 @@ def trekking_history():
         bookings=completed_bookings
     )
 
-
+#route of user profile
 @auth.route("/user/profile", methods=["GET", "POST"])
 def user_profile():
 
@@ -694,7 +699,7 @@ def user_profile():
         user=user
     )
 
-
+#route of view bookings
 @auth.route("/admin/bookings")
 def view_bookings():
 
@@ -705,7 +710,7 @@ def view_bookings():
         bookings=bookings
     )
 
-
+#route of admin trekking history 
 @auth.route("/admin/trekking_history")
 def admin_trekking_history():
 
@@ -718,7 +723,7 @@ def admin_trekking_history():
         bookings=completed_bookings
     )
 
-
+#route of complete booking
 @auth.route("/admin/complete_booking/<int:booking_id>")
 def complete_booking(booking_id):
 
@@ -730,7 +735,7 @@ def complete_booking(booking_id):
 
     return redirect(url_for("auth.view_bookings"))
 
-
+#route of mark paid
 @auth.route("/admin/mark_paid/<int:booking_id>")
 def mark_paid(booking_id):
 
@@ -741,7 +746,7 @@ def mark_paid(booking_id):
     db.session.commit()
 
     return redirect(url_for("auth.view_bookings"))
-
+#route of deactivate user
 @auth.route("/admin/deactivate_user/<int:user_id>")
 def deactivate_user(user_id):
 
@@ -753,7 +758,7 @@ def deactivate_user(user_id):
 
     return redirect(url_for("auth.view_users"))
 
-
+#route of activate user
 @auth.route("/admin/activate_user/<int:user_id>")
 def activate_user(user_id):
 
