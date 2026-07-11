@@ -20,9 +20,21 @@ def register():
     if request.method == "POST":
 
         full_name = request.form["full_name"]
-        email = request.form["email"]
+        email = request.form["email"].strip().lower()   #suppose user enter User@gmail.com and later tries user@gmail.com
         password = request.form["password"]
         role = request.form["role"]
+
+        if len(full_name.strip()) < 2:
+            return "Full name must contain at least 3 characters"
+
+        if len(password) < 6:
+            return "Password must contain at least 6 characters"
+
+        if role not in ["trekker", "staff"]:
+            return "Invalid role selected"
+        
+        if "@" not in email or "." not in email:
+            return "Invalid email address"
 
         existing_user = User.query.filter_by(
             email=email
@@ -352,12 +364,29 @@ def add_trek():
 
     if request.method == "POST":
 
+        trek_name = request.form["trek_name"].strip()
+        location = request.form["location"].strip()
+        duration_days = int(request.form["duration_days"])
+        available_slots = int(request.form["available_slots"])
+
+        if len(trek_name) < 2:
+            return "Trek name must contain at least 2 characters"
+
+        if not location:
+            return "Location is required"
+
+        if duration_days < 1:
+            return "Duration must be at least 1 day"
+
+        if available_slots < 1:
+            return "Available slots must be at least 1"
+
         trek = Trek(
-            trek_name=request.form["trek_name"],
-            location = request.form["location"],
+            trek_name=trek_name,
+            location=location,
             difficulty=request.form["difficulty"],
-            duration_days=request.form["duration_days"],
-            available_slots=request.form["available_slots"]
+            duration_days=duration_days,
+            available_slots=available_slots
         )
 
         db.session.add(trek)
@@ -405,6 +434,23 @@ def edit_trek(id):
     trek = Trek.query.get_or_404(id)
 
     if request.method == "POST":
+
+        trek_name = request.form["trek_name"].strip()
+        location = request.form["location"].strip()
+        duration_days = int(request.form["duration_days"])
+        available_slots = int(request.form["available_slots"])
+
+        if len(trek_name) < 2:
+            return "Trek name must contain at least 3 characters"
+
+        if not location:
+            return "Location is required"
+
+        if duration_days < 1:
+            return "Duration must be at least 1 day"
+
+        if available_slots < 1:
+            return "Available slots must be at least 1"
 
         trek.trek_name = request.form["trek_name"]
         trek.location = request.form["location"]

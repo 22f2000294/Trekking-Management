@@ -12,8 +12,14 @@
 <form method="POST">
 
     Trek Name <br>
-    <input type="text" name="trek_name" required><br>
-    <br>
+    <input
+        type="text"
+        name="trek_name"
+        minlength="2"
+        maxlength="100"
+        required
+    >
+    <br><br>
     Location <br>
 
     <input
@@ -29,13 +35,26 @@
         <option>Easy</option>
         <option>Moderate</option>
         <option>Hard</option>
-    </select><br><br>
+    </select><br>
 
-    Duration (Days)<br>
-    <input type="number" name="duration_days" required><br><br>
+    <br>
+
+    Duration (Days)<br> 
+    <input
+        type="number"
+        name="duration_days"
+        min="1"
+        required
+    >
+    <br><br>
 
     Available Slots<br>
-    <input type="number" name="available_slots" required><br><br>
+    <input
+        type="number"
+        name="available_slots"
+        min="1"
+        required
+    >
 
     <input type="submit" value="Add Trek">
 
