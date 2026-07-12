@@ -1,104 +1,206 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>View Treks</title>
-    <form method="GET">
 
-    <input
-        type="text"
-        name="search"
-        placeholder="Search Trek..."
-    >
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
-    <input
-        type="submit"
-        value="Search"
-    >
-
-</form>
-
-<br>
 </head>
 
-<body>
 
-<h1>All Treks</h1>
+<body class="bg-light">
 
-<table border="1" cellpadding="10">
+<div class="container py-4">
 
-<tr>
-    <th>ID</th>
-    <th>Trek Name</th>
-    <th>Difficulty</th>
-    <th>Duration</th>
-    <th>Available Slots</th>
-    <th>Assigned Staff</th>
-    <th>Assign</th>
-    <th>Edit</th>
-    <th>Delete</th>
-    <th>Remove</th>
-</tr>
 
-{% for trek in treks %}
+    <!-- Page Heading -->
 
-<tr>
+    <h1 class="text-center mb-4">
+        All Treks
+    </h1>
 
-<td>{{ trek.id }}</td>
 
-<td>{{ trek.trek_name }}</td>
+    <!-- Search Section -->
 
-<td>{{ trek.difficulty }}</td>
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
 
-<td>{{ trek.duration_days }}</td>
+            <form method="GET">
 
-<td>{{ trek.available_slots }}</td>
+                <div class="row g-2">
+                    <div class="col-12 col-md-9">
 
-<td>
-    {% if trek.assigned_staff %}
-        {{ trek.assigned_staff.full_name }}
-    {% else %}
-        Not Assigned
-    {% endif %}
-</td>
+                        <input type="text"
+                               name="search"
+                               class="form-control"
+                               placeholder="Search Trek...">
 
-<td>
-    <a href="/admin/assign_staff/{{ trek.id }}">Assign</a>
-</td>
+                    </div>
 
-<td>
 
-{% if trek.assigned_staff %}
+                    <div class="col-12 col-md-3">
 
-<a href="/admin/remove_staff/{{ trek.id }}">
-    Remove
-</a>
+                        <button type="submit"
+                                class="btn btn-info w-100">
 
-{% else %}
+                            Search
 
--
+                        </button>
 
-{% endif %}
+                    </div>
+                </div>
 
-</td>
+            </form>
 
-<td>
-    <a href="/admin/edit_trek/{{ trek.id }}">Edit</a>
-</td>
+        </div>
+    </div>
 
-<td>
-    <a href="/admin/delete_trek/{{ trek.id }}">Delete</a>
-</td>
 
-</tr>
+    <!-- Trek Table -->
 
-{% endfor %}
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
 
-</table>
+                <table class="table table-bordered table-hover align-middle">
 
-<br>
+                    <thead class="table-dark">
 
-<a href="/admin/dashboard">Back to Dashboard</a>
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Trek Name</th>
+                            <th>Difficulty</th>
+                            <th>Duration</th>
+                            <th>Available Slots</th>
+                            <th>Assigned Staff</th>
+                            <th>Assign</th>
+                            <th>Remove</th>
+                            <th>Edit</th>
+                            <th>Delete</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for trek in treks %}
+
+                        <tr>
+                            <td>{{ trek.id }}</td>
+                            <td>{{ trek.trek_name }}</td>
+                            <td>{{ trek.difficulty }}</td>
+                            <td>{{ trek.duration_days }}</td>
+                            <td>{{ trek.available_slots }}</td>
+
+                            <td>
+
+                                {% if trek.assigned_staff %}
+
+                                    {{ trek.assigned_staff.full_name }}
+
+                                {% else %}
+
+                                    Not Assigned
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <a href="/admin/assign_staff/{{ trek.id }}"
+                                   class="btn btn-sm btn-primary">
+
+                                    Assign
+
+                                </a>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if trek.assigned_staff %}
+
+                                    <a href="/admin/remove_staff/{{ trek.id }}"
+                                       class="btn btn-sm btn-warning">
+
+                                        Remove
+
+                                    </a>
+
+                                {% else %}
+
+                                    -
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                <a href="/admin/edit_trek/{{ trek.id }}"
+                                   class="btn btn-sm btn-success">
+
+                                    Edit
+
+                                </a>
+
+                            </td>
+
+
+                            <td>
+
+                                <a href="/admin/delete_trek/{{ trek.id }}"
+                                   class="btn btn-sm btn-danger">
+
+                                    Delete
+
+                                </a>
+
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Back Button -->
+
+    <div class="mt-4">
+
+        <a href="/admin/dashboard"
+           class="btn btn-dark">
+
+            Back to Dashboard
+
+        </a>
+
+    </div>
+</div>
 
 </body>
+
 </html>

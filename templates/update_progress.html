@@ -1,43 +1,104 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>Update Trek Progress</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
 </head>
 
-<body>
 
-<h1>Update Trek Progress</h1>
+<body style="background-color: rgb(27, 95, 21);">
 
-<h3>Trek: {{ trek.trek_name }}</h3>
 
-<form method="POST">
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
 
-    <label>Progress Status:</label>
 
-    <select name="progress_status" required>
+                    <h1 class="text-center mb-3">
+                        Update Trek Progress
+                    </h1>
 
-        <option value="Not Started">Not Started</option>
-        <option value="Ongoing">Ongoing</option>
-        <option value="Completed">Completed</option>
 
-    </select>
+                    <h5 class="text-center text-muted mb-4">
 
-    <br><br>
+                        Trek: {{ trek.trek_name }}
 
-    <input
-        type="submit"
-        value="Update Progress"
-    >
+                    </h5>
 
-</form>
 
-<br>
+                    <form method="POST">
 
-<a href="/staff/dashboard">
-    Back to Dashboard
-</a>
+
+                        <div class="mb-4">
+
+                            <label class="form-label">
+
+                                Progress Status
+
+                            </label>
+
+
+                            <select name="progress_status"
+                                    class="form-select"
+                                    required>
+
+                                <option value="Not Started">
+                                    Not Started
+                                </option>
+
+                                <option value="Ongoing">
+                                    Ongoing
+                                </option>
+
+                                <option value="Completed">
+                                    Completed
+                                </option>
+
+                            </select>
+
+
+                        </div>
+
+                        <button type="submit"
+                                class="btn btn-success w-100">
+
+                            Update Progress
+
+                        </button>
+
+                    </form>
+
+
+                    <div class="mt-3">
+
+
+                        <a href="/staff/dashboard"
+                           class="btn btn-outline-dark w-100">
+
+                            Back to Dashboard
+
+                        </a>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
-
 </html>
