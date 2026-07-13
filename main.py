@@ -3,9 +3,17 @@ from models.models import db, User
 from werkzeug.security import generate_password_hash
 from controllers.auth import auth
 from controllers.api import api
+from flask_login import LoginManager
 
 
 app = Flask(__name__)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "auth.login"
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(User, int(user_id))
 
 app.secret_key = "trekking-secret-key"
 

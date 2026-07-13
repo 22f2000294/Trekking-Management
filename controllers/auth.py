@@ -3,6 +3,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.security import generate_password_hash
 from models.models import db, User, Trek, Booking
 from sqlalchemy import or_
+from flask_login import login_user, logout_user, login_required, current_user
 
 from models.models import (
     db,
@@ -96,6 +97,8 @@ def login():
         session["user_id"] = user.id    #with the help of user id, check his role and assign his dashboard 
         session["role"] = user.role
 
+        login_user(user)
+
         if user.role == "Admin":
             return redirect(url_for("auth.admin_dashboard"))   #redirect to the admin dashboard 
 
@@ -107,10 +110,23 @@ def login():
     return render_template("login.html")
 
 #==========================================================
+#route of logout 
+@auth.route("/logout")
+def logout():
+    logout_user()
+    session.clear()
+
+    return redirect("/login")
+
+#==========================================================
 #route of pending staff 
 
 @auth.route("/admin/pending_staff")
+@login_required
 def pending_staff():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     staff_members = User.query.filter_by(         #if role is staff and status is pending, redirect to pending_staff.html
         role="staff",
@@ -126,7 +142,11 @@ def pending_staff():
 #route of approved staff
 
 @auth.route("/approve_staff/<int:user_id>")
+@login_required
 def approve_staff(user_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     staff = User.query.get(user_id)
 
@@ -140,7 +160,11 @@ def approve_staff(user_id):
 #route of admin dashboard
 
 @auth.route("/admin/dashboard")
+@login_required
 def admin_dashboard():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     total_users = User.query.filter_by(role="trekker").count()
 
@@ -162,7 +186,11 @@ def admin_dashboard():
 #route of staff dashboard
 
 @auth.route("/staff/dashboard")
+@login_required
 def staff_dashboard():
+
+    if current_user.role != "staff":
+        return "Access Denied"
 
     staff_id = session["user_id"]
 
@@ -204,7 +232,11 @@ def staff_dashboard():
 #staff can update slots from using it 
 
 @auth.route("/staff/update_slots/<int:trek_id>", methods=["GET", "POST"])
+@login_required
 def update_slots(trek_id):
+
+    if current_user.role != "staff":
+        return "Access Denied"
 
     staff_id = session["user_id"]    #staff can update slots
 
@@ -261,8 +293,11 @@ def update_status(trek_id):
 #staff can update progress from using it 
 
 @auth.route("/staff/update_progress/<int:trek_id>", methods=["GET", "POST"])
+@login_required
 def update_progress(trek_id):
 
+    if current_user.role != "staff":
+        return "Access Denied"
     staff_id = session["user_id"]    #staff can update progress 
 
     trek = Trek.query.filter_by(
@@ -287,7 +322,11 @@ def update_progress(trek_id):
 #staff can view participants from using it 
 
 @auth.route("/staff/participants/<int:trek_id>")
+@login_required
 def view_participants(trek_id):
+
+    if current_user.role != "staff":
+        return "Access Denied"
 
     staff_id = session["user_id"]       #staff can view participants
 
@@ -311,7 +350,11 @@ def view_participants(trek_id):
 #staff can view staff profile from using it 
 
 @auth.route("/staff/profile", methods=["GET", "POST"])
+@login_required
 def staff_profile():
+
+    if current_user.role != "staff":
+        return "Access Denied"
 
     staff = User.query.get_or_404(session["user_id"])  #here staff search about other staff by using user id of that staff
                                                         #if not found show 404 error
@@ -338,7 +381,11 @@ def staff_profile():
 #staff can remove participants from using it 
 
 @auth.route("/staff/remove_participant/<int:booking_id>")
+@login_required
 def remove_participant(booking_id):
+
+    if current_user.role != "staff":
+        return "Access Denied"
 
     staff_id = session["user_id"]
 
@@ -368,7 +415,11 @@ def remove_participant(booking_id):
 #route of USER DASHBOARD
 
 @auth.route("/user/dashboard")
+@login_required
 def user_dashboard():
+
+    if current_user.role != "trekker":
+        return "Access Denied"
 
     user_id = session["user_id"]
 
@@ -398,7 +449,11 @@ def user_dashboard():
 #route of ADD TREKS 
 
 @auth.route("/admin/add_trek", methods=["GET", "POST"])
+@login_required
 def add_trek():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     if request.method == "POST":
 
@@ -438,7 +493,11 @@ def add_trek():
 #route of VIEW TREKS
 
 @auth.route("/admin/treks")
+@login_required
 def view_treks():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     search = request.args.get("search")
 
@@ -461,7 +520,11 @@ def view_treks():
 #route of delete trek
 
 @auth.route("/admin/delete_trek/<int:id>")
+@login_required
 def delete_trek(id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     trek = Trek.query.get_or_404(id)
 
@@ -475,7 +538,11 @@ def delete_trek(id):
 #route of edit trek
 
 @auth.route("/admin/edit_trek/<int:id>", methods=["GET", "POST"])
+@login_required
 def edit_trek(id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     trek = Trek.query.get_or_404(id)     #if avail then show otherwise error 
 
@@ -518,7 +585,11 @@ def edit_trek(id):
 #route of view staff which is seen by admin
 
 @auth.route("/admin/staff")
+@login_required
 def view_staff():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     search = request.args.get("search")
 
@@ -546,7 +617,11 @@ def view_staff():
 #route of assign staff by admin for a trek
 
 @auth.route("/admin/assign_staff/<int:trek_id>", methods=["GET", "POST"])
+@login_required
 def assign_staff(trek_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     trek = Trek.query.get_or_404(trek_id)
 
@@ -573,7 +648,11 @@ def assign_staff(trek_id):
 #route of remove staff by admin from a trek
 
 @auth.route("/admin/remove_staff/<int:trek_id>")
+@login_required
 def remove_staff(trek_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     trek = Trek.query.get_or_404(trek_id)
 
@@ -587,7 +666,11 @@ def remove_staff(trek_id):
 #route of view user by admin
 
 @auth.route("/admin/users")
+@login_required
 def view_users():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     search = request.args.get("search")
 
@@ -618,8 +701,11 @@ def view_users():
 #route to view user treks
 
 @auth.route("/user/treks")
+@login_required
 def user_treks():
 
+    if current_user.role != "trekker":
+        return "Access Denied"
     search = request.args.get("search")            #call to search function
     difficulty = request.args.get("difficulty")    #call to difficulty funct
 
@@ -646,7 +732,11 @@ def user_treks():
 #route of book trek
 
 @auth.route("/user/book_trek/<int:trek_id>")
+@login_required
 def book_trek(trek_id):
+
+    if current_user.role != "trekker":
+        return "Access Denied"
 
     user_id = session["user_id"]
 
@@ -683,7 +773,11 @@ def book_trek(trek_id):
 #route of user can view my bookings
 
 @auth.route("/user/bookings")
+@login_required
 def my_bookings():
+
+    if current_user.role != "trekker":
+        return "Access Denied"
 
     user_id = session["user_id"]
 
@@ -700,7 +794,11 @@ def my_bookings():
 #route of cancel booking
 
 @auth.route("/user/cancel_booking/<int:booking_id>")
+@login_required
 def cancel_booking(booking_id):
+
+    if current_user.role != "trekker":
+        return "Access Denied"
 
     user_id = session["user_id"]
 
@@ -723,7 +821,11 @@ def cancel_booking(booking_id):
 #route of user trekking history
 
 @auth.route("/user/trekking_history")
+@login_required
 def trekking_history():
+
+    if current_user.role != "trekker":
+        return "Access Denied"
 
     user_id = session["user_id"]
 
@@ -741,7 +843,11 @@ def trekking_history():
 #route of user profile
 
 @auth.route("/user/profile", methods=["GET", "POST"])
+@login_required
 def user_profile():
+
+    if current_user.role != "trekker":
+        return "Access Denied"
 
     user = User.query.get_or_404(session["user_id"])
 
@@ -767,7 +873,11 @@ def user_profile():
 #route of view bookings by admin
 
 @auth.route("/admin/bookings")
+@login_required
 def view_bookings():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     bookings = Booking.query.all()
 
@@ -780,7 +890,11 @@ def view_bookings():
 #route of admin can view trekking history 
 
 @auth.route("/admin/trekking_history")
+@login_required
 def admin_trekking_history():
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     completed_bookings = Booking.query.filter_by(
         booking_status="Completed"
@@ -795,7 +909,11 @@ def admin_trekking_history():
 #route of admin can view complete booking
 
 @auth.route("/admin/complete_booking/<int:booking_id>")
+@login_required
 def complete_booking(booking_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     booking = Booking.query.get_or_404(booking_id)
 
@@ -809,7 +927,11 @@ def complete_booking(booking_id):
 #route of mark paid by admin
 
 @auth.route("/admin/mark_paid/<int:booking_id>")
+@login_required
 def mark_paid(booking_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     booking = Booking.query.get_or_404(booking_id)
 
@@ -823,8 +945,11 @@ def mark_paid(booking_id):
 #route of deactivate user by admin
 
 @auth.route("/admin/deactivate_user/<int:user_id>")
+@login_required
 def deactivate_user(user_id):
 
+    if current_user.role != "Admin":
+        return "Access Denied"
     user = User.query.get_or_404(user_id)
 
     user.status = "deactivated"
@@ -837,7 +962,11 @@ def deactivate_user(user_id):
 #route of activate user by admin
 
 @auth.route("/admin/activate_user/<int:user_id>")
+@login_required
 def activate_user(user_id):
+
+    if current_user.role != "Admin":
+        return "Access Denied"
 
     user = User.query.get_or_404(user_id)
 
