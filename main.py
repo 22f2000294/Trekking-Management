@@ -3,12 +3,12 @@ from models.models import db, User
 from werkzeug.security import generate_password_hash
 from controllers.auth import auth
 from controllers.api import api
-from flask_login import LoginManager
+from flask_login import LoginManager  
 
 
 app = Flask(__name__)
 
-login_manager = LoginManager()
+login_manager = LoginManager()       #it helps to redirect on a page when u logged in 
 login_manager.init_app(app)
 login_manager.login_view = "auth.login"
 @login_manager.user_loader
@@ -29,31 +29,16 @@ with app.app_context():
 
     db.create_all()
 
-    # try:
-    #     db.session.execute(
-    #         text(
-    #             "ALTER TABLE treks "
-    #             "ADD COLUMN location VARCHAR(100)"
-    #         )
-    #     )
-    #     db.session.commit()
-    #     print("location column added successfully")
-
-    # except Exception:
-    #     db.session.rollback()
-    #     print("location column already exists")
-
-    # Create default admin if not exists
     admin = User.query.filter_by(
-        email="admin@trekking.com"
+        email="rkm_admin@trekking.com"
     ).first()
 
     if not admin:
 
         admin_user = User(
             full_name="System Admin",
-            email="admin@trekking.com",
-            password=generate_password_hash("admin123"),
+            email="rkm_admin@trekking.com",
+            password=generate_password_hash("@rkm123"),
             role="Admin"
         )
 

@@ -5,6 +5,7 @@ from models.models import db, User, Trek, Booking
 from sqlalchemy import or_
 from flask_login import login_user, logout_user, login_required, current_user
 
+
 from models.models import (
     db,
     User,
@@ -65,8 +66,7 @@ def register():
         db.session.add(new_user)     #it means to add new user in DB 
         db.session.commit()          #save the changes in DB permanently
 
-        return "Registration Successful"
-
+        return redirect("/login")
     return render_template("register.html")   #redirect to registration page 
 
 #==========================================================
